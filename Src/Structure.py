@@ -46,7 +46,7 @@ class BaseWeapon(BaseItem):
         self.price = random.randint(5, 5 * self.level, 5) + self.calc_rarity_price()
 
     def use(self, other):
-        # TODO when enemy and character are implemented use the attacked function
+        # TODO return the attack value based on other's armor
         pass
 
     def bought(self, other):
@@ -73,23 +73,36 @@ class ConsumableItem(BaseItem):
 
 
 class PlayableCharacter(BaseCharacter):
-    def __init__(self, level, name="Player"):
+    def __init__(self, level, name="Player", items=[], weapon=None):
         super(PlayableCharacter, self).__init__(name, level)
+        self.items = items
+        self.weapon = weapon
+        # TODO add math to calculate the hp based on lever
 
     def attack(self, other):
+        # TODO check other type and call attacked function with self.weapon
         pass
 
     def get_xp(self, xp):
+        # TODO check if over cap if do call level up
         pass
 
     def level_up(self):
+        # TODO add level and add hp based on the level
         pass
 
     def use_item(self, other):
+        # TODO check if other exists in self.items. is yes call used function of item and remove from self.items
         pass
 
     def attacked(self, other):
+        # TODO remove hp based on other attack values
         pass
 
     def interacted(self, other):
-        pass
+        if isinstance(other, BaseCharacter):
+            print "{} tried to touch you. it was not plesent at all".format(other.name)
+        elif isinstance(other, BaseItem):
+            print "for some reason {} tried to touch you. you feel violated".format(other.name)
+        else:
+            print "error <{}> not a known type".format(type(other))
