@@ -6,7 +6,7 @@ class BaseCharacter:
         self.name = name
         self.level = level
 
-    def attacked(self, other):
+    def attacked(self, attacker):
         raise NotImplementedError
 
     def interacted(self, other):
@@ -33,10 +33,10 @@ class BaseItem:
         elif self.rarity == "Legendary":
             return 10000
 
-    def bought(self, other):
+    def bought(self, buyer):
         raise NotImplementedError
 
-    def use(self, other):
+    def use(self, user):
         raise NotImplementedError
 
 
@@ -45,13 +45,13 @@ class BaseWeapon(BaseItem):
         super.__init__(name, desc, level, rarity, is_owned)
         self.price = random.randint(5, 5 * self.level, 5) + self.calc_rarity_price()
 
-    def use(self, other):
-        # TODO return the attack value based on other's armor
+    def use(self, user):
+        # TODO return the attack value (no need for user)
         pass
 
-    def bought(self, other):
+    def bought(self, buyer):
         if not self.is_owned:
-            # TODO when player character is implemented reduce the gold based on the self.price of the weapon
+            # TODO when player character is implemented reduce the gold based on the self.price of the weapon and checks if playable character has enough gold
             self.price /= 2
             self.is_owned = True
 
@@ -61,11 +61,11 @@ class ConsumableItem(BaseItem):
         super.__init__(name, desc, level, rarity, is_owned)
         self.price = random.randint(5, 5 * self.level, 5) + (self.calc_rarity_price() / 10)
 
-    def use(self, other):
+    def use(self, user):
         # TODO when enemy and character are implemented add the desired effect
         pass
 
-    def bought(self, other):
+    def bought(self, buyer):
         if not self.is_owned:
             # TODO when player character is implemented reduce the gold based on the self.price of the weapon
             self.price /= 2
@@ -80,8 +80,8 @@ class PlayableCharacter(BaseCharacter):
         self.armor = armor
         # TODO add math to calculate the hp based on level
 
-    def attack(self, other):
-        # TODO check other type and call attacked function with self.weapon
+    def attack(self, enemy):
+        # TODO check enemy type and call attacked function with self.weapon
         pass
 
     def get_xp(self, xp):
@@ -92,12 +92,12 @@ class PlayableCharacter(BaseCharacter):
         # TODO add level and add hp based on the level
         pass
 
-    def use_item(self, other):
-        # TODO check if other exists in self.items. is yes call used function of item and remove from self.items
+    def use_item(self, item):
+        # TODO check if item exists in self.items. is yes call used function of item and remove from self.items
         pass
 
-    def attacked(self, other):
-        # TODO remove hp based on other attack values
+    def attacked(self, attacker):
+        # TODO remove hp based on attacker attack values
         pass
 
     def dead(self):
@@ -121,16 +121,16 @@ class Enemy(BaseCharacter):
         self.armor = armor
         # TODO add math to calculate the hp based on level
 
-    def attack(self, other):
-        # TODO check other type and call attacked function with self.weapon
+    def attack(self, enemy):
+        # TODO check enemy type and call attacked function with self.weapon
         pass
 
-    def use_item(self, other):
-        # TODO check if other exists in self.items. is yes call used function of item and remove from self.items
+    def use_item(self, item):
+        # TODO check if item exists in self.items. is yes call used function of item and remove from self.items
         pass
 
-    def attacked(self, other):
-        # TODO remove hp based on other attack values
+    def attacked(self, attacker):
+        # TODO remove hp based on attacker attack values
         pass
 
     def dead(self, other):
