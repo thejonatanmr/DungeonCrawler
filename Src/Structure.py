@@ -73,11 +73,12 @@ class ConsumableItem(BaseItem):
 
 
 class PlayableCharacter(BaseCharacter):
-    def __init__(self, level, name="Player", items=[], weapon=None):
+    def __init__(self, level, name="Player", items=[], weapon=None, armor=None):
         super(PlayableCharacter, self).__init__(name, level)
         self.items = items
         self.weapon = weapon
-        # TODO add math to calculate the hp based on lever
+        self.armor = armor
+        # TODO add math to calculate the hp based on level
 
     def attack(self, other):
         # TODO check other type and call attacked function with self.weapon
@@ -99,10 +100,45 @@ class PlayableCharacter(BaseCharacter):
         # TODO remove hp based on other attack values
         pass
 
+    def dead(self):
+        # TODO end current run
+        pass
+
     def interacted(self, other):
         if isinstance(other, BaseCharacter):
             print "{} tried to touch you. it was not plesent at all".format(other.name)
         elif isinstance(other, BaseItem):
             print "for some reason {} tried to touch you. you feel violated".format(other.name)
         else:
-            print "error <{}> not a known type".format(type(other))
+            print "error <{}> not a supported type in <{}>".format(type(other), self.interacted)
+
+
+class Enemy(BaseCharacter):
+    def __init__(self, level, name="Enemy", items=[], weapon=None, armor=None):
+        super(Enemy, self).__init__(name, level)
+        self.items = items
+        self.weapon = weapon
+        self.armor = armor
+        # TODO add math to calculate the hp based on level
+
+    def attack(self, other):
+        # TODO check other type and call attacked function with self.weapon
+        pass
+
+    def use_item(self, other):
+        # TODO check if other exists in self.items. is yes call used function of item and remove from self.items
+        pass
+
+    def attacked(self, other):
+        # TODO remove hp based on other attack values
+        pass
+
+    def dead(self, other):
+        # TODO if other is instance of playableCharacter give other gold and xp based on level
+        pass
+
+    def interacted(self, other):
+        if isinstance(other, BaseCharacter):
+            print "You tried to touch {}. he was not pleased".format(self.name)
+        else:
+            print "error <{}> not a supported type in <{}>".format(type(other), self.interacted)
