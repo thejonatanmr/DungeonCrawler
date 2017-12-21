@@ -49,7 +49,7 @@ class BaseWeapon(BaseItem):
 
     def use(self):
         raw = self.damage_base * random.randint(1, 2)
-        return raw + (random.randint(1, 5) * self.level) * self.damage_mul
+        return (raw + (random.randint(0, 3) * self.level)) * self.damage_mul
 
     def bought(self, buyer):
         if not self.is_owned:
@@ -154,7 +154,8 @@ class PlayableCharacter(BaseCharacter):
         print "Name: {}".format(self.name)
         print "Level: {} - {}/{}".format(self.level, self.xp, self.xp_cap)
         print "Hp: {}/{}".format(self.hp, self.max_hp)
-        print "Weapon: '{}' - {} * {}".format(self.weapon.name, self.weapon.damage_base, self.weapon.damage_mul)
+        print "Weapon: {} - {} * {}".format(self.weapon.name, self.weapon.damage_base, self.weapon.damage_mul)
+        print " - '{}'".format(self.weapon.desc)
         print "-----------------------"
 
 
@@ -199,5 +200,5 @@ class Enemy(BaseCharacter):
         print "Name: {}".format(self.name)
         print "Level: {}".format(self.level)
         print "Hp: {}/{}".format(self.hp, self.max_hp)
-        print "Weapon: '{}' - {} * {}".format(self.weapon.name, self.weapon.damage_base, self.weapon.damage_mul)
+        print "Weapon: {} - {} * {}".format(self.weapon.name, self.weapon.damage_base, self.weapon.damage_mul)
         print "------------------------"
