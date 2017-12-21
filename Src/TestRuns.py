@@ -5,4 +5,6 @@ player = PlayableCharacter(1, "John", stick)
 goblin = Enemy(1, stick)
 
 player.status()
+print player.weapon.use()
 goblin.status()
+print goblin.weapon.use()
