@@ -33,6 +33,18 @@ class BaseItem:
         elif self.rarity == "Legendary":
             return 10000
 
+    def rarity_to_number(self):
+        if self.rarity == "Common":
+            return 0
+        elif self.rarity == "Uncommon":
+            return 1
+        elif self.rarity == "Rare":
+            return 2
+        elif self.rarity == "Epic":
+            return 3
+        elif self.rarity == "Legendary":
+            return 4
+
     def bought(self, buyer):
         raise NotImplementedError
 
@@ -41,16 +53,14 @@ class BaseItem:
 
 
 class BaseWeapon(BaseItem):
-    def __init__(self, name, desc, rarity="Common", is_owned=False):
+    def __init__(self, name, desc, base_damage, damage_mul=1, rarity="Common", is_owned=False):
         BaseItem.__init__(self, name, desc, 1, rarity, is_owned)
         self.price = 0
-        self.base_damage = 0
-        self.damage_mul = 0
-
-    def initialise(self, level, base_damage, damage_mul=1):
-        self.level = level
         self.base_damage = base_damage
         self.damage_mul = damage_mul
+
+    def initialise(self, level):
+        self.level = level
         self.price = random.randint(5, 5 * self.level) + self.calc_rarity_price()
 
     def use(self):
@@ -91,9 +101,12 @@ class ConsumableItem(BaseItem):
                 else:
                     print "Error, Buyer don't have enough gold"
             else:
-                print "Error, Buyer is not playable character"
+                print "Error, <{}> is not playable character".format(type(buyer))
         else:
             print "Error, self.is_owned is true"
+
+
+from Managers.ConsoleManager import *
 
 
 class PlayableCharacter(BaseCharacter):
@@ -110,8 +123,9 @@ class PlayableCharacter(BaseCharacter):
     def attack(self, enemy):
         if isinstance(enemy, Enemy):
             enemy.attacked(self.weapon.use())
+            ConsoleManager.attacked(self, enemy)
         else:
-            print "Error, enemy is not instance of Enemy class"
+            print "Error, <{}> is not instance of Enemy class".format(type(enemy))
 
     def get_xp(self, xp):
         self.xp += xp
@@ -149,22 +163,22 @@ class PlayableCharacter(BaseCharacter):
 
     def interacted(self, other):
         if isinstance(other, BaseCharacter):
-            print "{} tried to touch you. it was not plesent at all".format(other.name)
+            return "{} tried to touch you. it was not plesent at all".format(other.name)
         elif isinstance(other, BaseItem):
-            print "for some reason {} tried to touch you. you feel violated".format(other.name)
+            return "for some reason {} tried to touch you. you feel violated".format(other.name)
         else:
             print "error <{}> not a supported type in <{}>".format(type(other), self.interacted)
 
     def status(self):
-        print "---------Player--------\n" \
-              "Name: {}\n" \
-              "Level: {} - {}/{}\n" \
-              "Hp: {}/{}\n" \
-              "Weapon: {} - {} * {}\n" \
-              "  - '{}'\n" \
-              "-----------------------".format(self.name, self.level, self.xp, self.xp_cap, self.hp, self.max_hp,
-                                               self.weapon.name, self.weapon.base_damage, self.weapon.damage_mul,
-                                               self.weapon.desc)
+        return "---------Player--------\n" \
+               "Name: {}\n" \
+               "Level: {} - {}/{}\n" \
+               "Hp: {}/{}\n" \
+               "Weapon: {} - {} * {}\n" \
+               "  - '{}'\n" \
+               "-----------------------".format(self.name, self.level, self.xp, self.xp_cap, self.hp, self.max_hp,
+                                                self.weapon.name, self.weapon.base_damage, self.weapon.damage_mul,
+                                                self.weapon.desc)
 
 
 class Enemy(BaseCharacter):
@@ -175,17 +189,17 @@ class Enemy(BaseCharacter):
         self.max_hp = 0
         self.hp = self.max_hp
 
-    def initialise(self, level, weapon):
+    def initialise(self, level):
         self.level = level
-        self.weapon = weapon
         self.max_hp = (20 * self.level) + (random.randint(1, 10) * self.level)
         self.hp = self.max_hp
 
     def attack(self, enemy):
         if isinstance(enemy, BaseCharacter):
             enemy.attacked(self.weapon.use())
+            ConsoleManager.attacked(self, enemy)
         else:
-            print "Error, enemy is not instance of BasicCharacter class"
+            print "Error, <{}> is not instance of BasicCharacter class".format(type(enemy))
 
     def use_item(self, item):
         # TODO check if item exists in self.items. is yes call used function of item and remove from self.items
@@ -205,15 +219,15 @@ class Enemy(BaseCharacter):
 
     def interacted(self, other):
         if isinstance(other, BaseCharacter):
-            print "You tried to touch {}. he was not pleased".format(self.name)
+            return "You tried to touch {}. he was not pleased".format(self.name)
         else:
             print "error <{}> not a supported type in <{}>".format(type(other), self.interacted)
 
     def status(self):
-        print "---------Player--------\n" \
-              "Name: {}\n" \
-              "Level: {}\n" \
-              "Hp: {}/{}\n" \
-              "Weapon: {} - {} * {}\n" \
-              "-----------------------".format(self.name, self.level, self.hp, self.max_hp, self.weapon.name,
-                                               self.weapon.base_damage, self.weapon.damage_mul)
+        return "---------Player--------\n" \
+               "Name: {}\n" \
+               "Level: {}\n" \
+               "Hp: {}/{}\n" \
+               "Weapon: {} - {} * {}\n" \
+               "-----------------------".format(self.name, self.level, self.hp, self.max_hp, self.weapon.name,
+                                                self.weapon.base_damage, self.weapon.damage_mul)
