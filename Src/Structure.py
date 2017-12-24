@@ -41,14 +41,20 @@ class BaseItem:
 
 
 class BaseWeapon(BaseItem):
-    def __init__(self, name, desc, level, rarity, damage_base, is_owned=False, damage_mul=1.0):
-        BaseItem.__init__(self, name, desc, level, rarity, is_owned)
-        self.price = random.randint(5, 5 * self.level) + self.calc_rarity_price()
-        self.damage_base = damage_base
+    def __init__(self, name, desc, rarity="Common", is_owned=False):
+        BaseItem.__init__(self, name, desc, 1, rarity, is_owned)
+        self.price = 0
+        self.base_damage = 0
+        self.damage_mul = 0
+
+    def initialise(self, level, base_damage, damage_mul=1):
+        self.level = level
+        self.base_damage = base_damage
         self.damage_mul = damage_mul
+        self.price = random.randint(5, 5 * self.level) + self.calc_rarity_price()
 
     def use(self):
-        raw = self.damage_base * random.randint(1, 2)
+        raw = self.base_damage
         return (raw + (random.randint(0, 3) * self.level)) * self.damage_mul
 
     def bought(self, buyer):
@@ -68,7 +74,7 @@ class BaseWeapon(BaseItem):
 
 class ConsumableItem(BaseItem):
     def __init__(self, name, desc, level, rarity, is_owned=False):
-        BaseItem.__init__(self,name, desc, level, rarity, is_owned)
+        BaseItem.__init__(self, name, desc, level, rarity, is_owned)
         self.price = random.randint(5, 5 * self.level, 5) + (self.calc_rarity_price() / 10)
 
     def use(self, user):
@@ -150,19 +156,27 @@ class PlayableCharacter(BaseCharacter):
             print "error <{}> not a supported type in <{}>".format(type(other), self.interacted)
 
     def status(self):
-        print "---------Player--------"
-        print "Name: {}".format(self.name)
-        print "Level: {} - {}/{}".format(self.level, self.xp, self.xp_cap)
-        print "Hp: {}/{}".format(self.hp, self.max_hp)
-        print "Weapon: {} - {} * {}".format(self.weapon.name, self.weapon.damage_base, self.weapon.damage_mul)
-        print " - '{}'".format(self.weapon.desc)
-        print "-----------------------"
+        print "---------Player--------\n" \
+              "Name: {}\n" \
+              "Level: {} - {}/{}\n" \
+              "Hp: {}/{}\n" \
+              "Weapon: {} - {} * {}\n" \
+              "  - '{}'\n" \
+              "-----------------------".format(self.name, self.level, self.xp, self.xp_cap, self.hp, self.max_hp,
+                                               self.weapon.name, self.weapon.base_damage, self.weapon.damage_mul,
+                                               self.weapon.desc)
 
 
 class Enemy(BaseCharacter):
-    def __init__(self, level, weapon=None, name="Enemy", items=[]):
-        BaseCharacter.__init__(self, name, level)
+    def __init__(self, weapon=None, name="Enemy", items=[]):
+        BaseCharacter.__init__(self, name, 1)
         self.items = items
+        self.weapon = weapon
+        self.max_hp = 0
+        self.hp = self.max_hp
+
+    def initialise(self, level, weapon):
+        self.level = level
         self.weapon = weapon
         self.max_hp = (20 * self.level) + (random.randint(1, 10) * self.level)
         self.hp = self.max_hp
@@ -196,9 +210,10 @@ class Enemy(BaseCharacter):
             print "error <{}> not a supported type in <{}>".format(type(other), self.interacted)
 
     def status(self):
-        print "----------Enemy---------"
-        print "Name: {}".format(self.name)
-        print "Level: {}".format(self.level)
-        print "Hp: {}/{}".format(self.hp, self.max_hp)
-        print "Weapon: {} - {} * {}".format(self.weapon.name, self.weapon.damage_base, self.weapon.damage_mul)
-        print "------------------------"
+        print "---------Player--------\n" \
+              "Name: {}\n" \
+              "Level: {}\n" \
+              "Hp: {}/{}\n" \
+              "Weapon: {} - {} * {}\n" \
+              "-----------------------".format(self.name, self.level, self.hp, self.max_hp, self.weapon.name,
+                                               self.weapon.base_damage, self.weapon.damage_mul)
